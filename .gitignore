@@ -1,1 +1,10 @@
 dashboard/migrations
+dashboard/__pycache__/admin.cpython-38.pyc
+dashboard/__pycache__/vendorModel.cpython-38.pyc
+dashboard/__pycache__/vendorStockModel.cpython-38.pyc
+
+mobile_app/__pycache__/serializers.cpython-38.pyc
+mobile_app/__pycache__/urls.cpython-38.pyc
+mobile_app/__pycache__/views.cpython-38.pyc
+
+

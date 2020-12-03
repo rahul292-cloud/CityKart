@@ -1,15 +1,31 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from dashboard.vendorModel import Vendor_management
+from dashboard.productModel import Product_category, Product
+from dashboard.vendorStockModel import Vendor_Stock
 import re
 
 class VendorManagementSerializer(serializers.ModelSerializer):
-    userName = serializers.CharField(label='Username')
-    first_name = serializers.CharField(label='first_name')
-    last_name = serializers.CharField(label='last_name')
+    userName = serializers.CharField(label='Username', required=True)
+    fullName = serializers.CharField(label='fullName', required=True)
+    shopName = serializers.CharField(label='shopName', required=True)
+    phone1 = serializers.CharField(label='phone1', required=True)
+    phone2 = serializers.CharField(label='phone2', required=False, default='NA')
+    shopAddress = serializers.CharField(label='shopAddress', required=True)
+    city = serializers.CharField(label='city', required=True)
+    state = serializers.CharField(label='state', required=True)
+    pinCode = serializers.CharField(label='pinCode', required=True)
+    email = serializers.CharField(label='email', required=False, default='example123@gmail.com')
+    adhar_no = serializers.CharField(label='adhar_no', required=True)
+    adhar_Img = serializers.CharField(label='adhar_Img', required=False, default='""')
+    bank_name = serializers.CharField(label='bank_name', required=False, default='NA')
+    bank_branch = serializers.CharField(label='bank_branch', required=False, default='NA')
+    bank_address = serializers.CharField(label='bank_address', required=False, default='NA')
+    ifsc_code = serializers.CharField(label='ifsc_code', required=False, default='NA')
+    account_name = serializers.CharField(label='account_name', required=False, default='NA')
 
     # email = serializers.EmailField(label='Email Address')
-    mob_no = serializers.CharField(label='Mobile_No')
+    # mob_no = serializers.CharField(label='Mobile_No')
 
     password = serializers.CharField(label='Password')
     password2 = serializers.CharField(label='Confirm Password')
@@ -46,11 +62,11 @@ class VendorManagementSerializer(serializers.ModelSerializer):
     #     email = data.get("email")
     #     regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     #     if (re.search(regex, email)):
-    #         username_qs = User.objects.filter(username=email)
-    #         if username_qs.exists():
-    #             raise serializers.ValidationError("Email Id already exists")
-    #         else:
-    #             pass
+    #         # username_qs = User.objects.filter(username=email)
+    #         # if username_qs.exists():
+    #         #     raise serializers.ValidationError("Email Id already exists")
+    #         # else:
+    #         #     pass
     #         return value
     #     raise serializers.ValidationError("invalid Email id")
 
@@ -77,10 +93,22 @@ class VendorManagementSerializer(serializers.ModelSerializer):
 
         user = Vendor_management.objects.create(
             userName=validated_data['userName'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            # email=validated_data['email'],
-            mob_no=validated_data['mob_no'],
+            fullName=validated_data['fullName'],
+            shopName=validated_data['shopName'],
+            phone1=validated_data['phone1'],
+            phone2=validated_data['phone2'],
+            shopAddress=validated_data['shopAddress'],
+            city=validated_data['city'],
+            state=validated_data['state'],
+            pinCode=validated_data['pinCode'],
+            email=validated_data['email'],
+            adhar_no=validated_data['adhar_no'],
+            adhar_Img=validated_data['adhar_Img'],
+            bank_name=validated_data['bank_name'],
+            bank_branch=validated_data['bank_branch'],
+            bank_address=validated_data['bank_address'],
+            ifsc_code=validated_data['ifsc_code'],
+            account_name=validated_data['account_name'],
             password=validated_data['password']
         )
 
@@ -88,7 +116,9 @@ class VendorManagementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vendor_management
-        fields = ('userName', 'first_name', 'last_name', 'mob_no', 'password', 'password2')  # 'userName', 'email',
+        fields = ('userName', 'fullName', 'shopName', 'phone1', 'phone2', 'password', 'password2', 'shopAddress',
+                  'city', 'state', 'pinCode', 'email', 'adhar_no', 'adhar_Img', 'bank_name', 'bank_branch', 'bank_address',
+                  'ifsc_code', 'account_name')
 
 
 class GetVendorManagementSerializer(serializers.ModelSerializer):
@@ -96,7 +126,70 @@ class GetVendorManagementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vendor_management
-        fields = ['id', 'vendor_id', 'userName', 'login_type', 'first_name', 'last_name', 'email',
-                  'mob_no', 'image', 'created_at', 'updated_at'] # 'password',
+        fields = ['id', 'vendor_id', 'vendor_register_no', 'fullName', 'shopName', 'phone1', 'phone2', 'shopAddress',
+                  'city', 'state', 'pinCode', 'email', 'adhar_no', 'adhar_Img', 'bank_name', 'bank_branch', 'bank_address',
+                  'ifsc_code', 'account_name', 'userName', 'login_type', 'created_at',]
         # depth = 1
+
+class Product_CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product_category
+        fields = ['id', 'category_id', 'category_name', 'category_description', 'product_thumbnail', 'status'
+                  ]
+
+    def update(self, instance, validated_data):
+        instance.category_id = validated_data.get('category_id', instance.category_id)
+        instance.category_name = validated_data.get('category_name', instance.category_name)
+        instance.category_description = validated_data.get('category_description', instance.category_description)
+        instance.product_thumbnail = validated_data.get('product_thumbnail', instance.product_thumbnail)
+        instance.status = validated_data.get('status', instance.status)
+
+        instance.save()
+
+        return instance
+
+class Product_viewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'product_id', 'product_category_id', 'product_name', 'product_description', 'product_images', 'gst',
+                  'product_price', 'product_status', 'discount', 'rating', 'status', 'subscription', 'created_at', 'updated_at', 'trending'
+                  ]
+
+    def update(self, instance, validated_data):
+        instance.product_id = validated_data.get('product_id', instance.product_id)
+        instance.product_category_id = validated_data.get('product_category_id', instance.product_category_id)
+        instance.product_name = validated_data.get('product_name', instance.product_name)
+        instance.product_description = validated_data.get('product_description', instance.product_description)
+        instance.product_images = validated_data.get('product_images', instance.product_images)
+        instance.product_price = validated_data.get('product_price', instance.product_price)
+        instance.product_status = validated_data.get('product_status', instance.product_status)
+        instance.discount = validated_data.get('discount', instance.discount)
+        instance.rating = validated_data.get('rating', instance.rating)
+        instance.status = validated_data.get('status', instance.status)
+        instance.subscription = validated_data.get('subscription', instance.subscription)
+        instance.gst = validated_data.get('gst', instance.gst)
+        instance.trending = validated_data.get('trending', instance.trending)
+
+        instance.save()
+
+        return instance
+
+# asign products to vendors
+class AddProductsToVendorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vendor_Stock
+        fields = ['id', 'vendor_id', 'product_id', 'quantity'
+                  ]
+
+    def update(self, instance, validated_data):
+        instance.vendor_id = validated_data.get('vendor_id', instance.vendor_id)
+        instance.product_id = validated_data.get('product_id', instance.product_id)
+        # instance.product_category_id = validated_data.get('product_category_id', instance.product_category_id)
+        instance.quantity = validated_data.get('quantity', instance.quantity)
+
+        instance.save()
+
+        return instance
+
 

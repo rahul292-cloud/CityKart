@@ -19,6 +19,8 @@ import random
 import re
 from dashboard.vendorModel import Vendor_management
 from dashboard.vendorStoreModel import VendorStore
+from dashboard.productModel import Product, Product_category
+from dashboard.vendorStockModel import Vendor_Stock
 
 from .serializers import *
 
@@ -173,17 +175,6 @@ class getStoreDetailsById(APIView):
 
     def post(self, request, pk=None):
         vendor_id = request.data.get('vendor_id', False)
-        # total_delivered_order = Order.objects.filter(vendor_management__vendor_id=vendor_id, delivery_status='Completed').count()
-        # print("total_delivered_order")
-        # print(total_delivered_order)
-
-        # total_cancel_delivery = VendorOrderReject.objects.filter(vendor_management_Id__vendor_id=vendor_id).count()
-        # print("total_cancel_delivery")
-        # print(total_cancel_delivery)
-
-        # in_process_orders = Order.objects.filter(vendor_management__vendor_id=vendor_id).exclude(delivery_status='Completed').count()
-        # print("in_process_orders")
-        # print(in_process_orders)
 
         vendor_store_details = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id).values('id', 'vendorStore_id',
                                                                                                  'store_name', 'popular_name',
@@ -197,10 +188,218 @@ class getStoreDetailsById(APIView):
             return Response({"data":vendor_store_details[0]}, status=status.HTTP_200_OK)
         else:
             return Response({"msg":"Store Details Is not Available , Add Store !"}, status=status.HTTP_400_BAD_REQUEST)
-        # print(vendor_store_details)
-        # details = {"total_delivered_order":total_delivered_order, "total_cancel_delivery":total_cancel_delivery,
-        #            "in_process_orders":in_process_orders, "vendor_store_details":vendor_store_details[0]}
-        # if vendor_store_details:
-        #     return Response(successResponseMethod(request, details), status=status.HTTP_200_OK)
-        # else:
-        #     return Response(errorResponseMethod(request, "Details Not Available !"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# get or create product category
+class ProductCategoryDetails(APIView):
+    permission_classes = (AllowAny,)
+
+    def get_object(self, pk):
+        try:
+            pk = pk
+            return Product_category.objects.get(pk=pk)
+        except Product_category.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk=None):
+        if pk:
+            response = []
+            pk = pk
+
+            data = Product_category.objects.filter(id=pk)
+            serializer = Product_CategorySerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+        else:
+            response = []
+            pk = None
+            data = Product_category.objects.all().order_by('-pk')
+            serializer = Product_CategorySerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+    def post(self, request, pk=None):
+        print(request.data)
+
+        serializer = Product_CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        print(request.data)
+        id = pk
+        instance = self.get_object(id)
+        print(instance)
+        serializer = Product_CategorySerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        # pk = ObjectId(pk)
+        pk = pk
+        productCategory = self.get_object(pk)
+        productCategory.delete()
+        return Response("productCategory Deleted")
+
+
+# get or create the product
+class productDetailsView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get_object(self, pk):
+        try:
+            pk = pk
+            return Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk=None):
+        print(request.data)
+        if pk:
+            response = []
+            pk = pk
+
+            data = Product.objects.filter(id=pk)
+            serializer = Product_viewSerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+        else:
+            response = []
+            pk = None
+
+            data = Product.objects.all().order_by('-pk')
+            print(data)
+            serializer = Product_viewSerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+    def post(self, request, pk=None):
+        print(request.data)
+
+        serializer = Product_viewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            # print(serializer.data)
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        # pk = ObjectId(pk)
+        print(request.data)
+        id = pk
+        instance = self.get_object(id)
+        print(instance)
+        serializer = Product_viewSerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        # pk = ObjectId(pk)
+        pk = pk
+        product = self.get_object(pk)
+        product.delete()
+        return Response("product Deleted")
+
+# create vendor stock ...admin can only create
+# add products to vendor store ... only for admin
+# asign products to vendors
+class AddProductsToVendor(APIView):
+    permission_classes = (AllowAny,)
+
+    def get_object(self, pk):
+        try:
+            pk = pk
+            return Vendor_Stock.objects.get(pk=pk)
+        except Vendor_Stock.DoesNotExist:
+            raise Http404
+
+    def post(self, request, *args, **kwargs):
+        vendor_id = request.data.get('vendor_id', False)
+        product_id = request.data.get('product_id', False)
+        vendor_Stock = Vendor_Stock.objects.filter(id=vendor_id, product_id=product_id)
+        if vendor_Stock.exists():
+            return Response('This Product Is Already Exists !', status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = AddProductsToVendorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+            product_category = Product.objects.filter(id=serializer.data['product_id']).values('id').annotate(product_categoryId = F('product_category_id__id'))
+            # print(product_category)
+            # print(product_category[0]['product_categoryId'])
+            try:
+                Vendor_Stock.objects.filter(id=serializer.data['id']).update(product_category_id=Product_category.objects.get(id=product_category[0]['product_categoryId']))
+            except:
+                product = self.get_object(serializer.data['id'])
+                product.delete()
+                return Response("Something went wrong ", status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        # pk = ObjectId(pk)
+        print(request.data)
+        id = pk
+        instance = self.get_object(id)
+
+        serializer = AddProductsToVendorSerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        pk = pk
+        product = self.get_object(pk)
+        product.delete()
+        return Response("Item Deleted ", status=status.HTTP_200_OK)
+
+# get stock details by vendor id .... admin only
+class GetAllProductsForStoreById(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        vendor_id = request.data.get('vendor_id', False)
+
+        v_stock = Vendor_Stock.objects.filter(vendor_id__vendor_id=vendor_id).values('id', 'quantity').annotate(
+            product_product_id = F('product_id__product_id'),
+            product_product_name = F('product_id__product_name'),
+            product_product_description = F('product_id__product_description'),
+            product_product_images = F('product_id__product_images'),
+            product_product_price = F('product_id__product_price'),
+            product_gst = F('product_id__gst'),
+            product_product_status = F('product_id__product_status'),
+            product_discount = F('product_id__discount'),
+            product_rating = F('product_id__rating'),
+            product_subscription = F('product_id__subscription'),
+
+            product_category_category_id = F('product_category_id__category_id'),
+            product_category_category_name = F('product_category_id__category_name'),
+            product_category_category_description = F('product_category_id__category_description'),
+            product_category_product_thumbnail = F('product_category_id__product_thumbnail'),
+        )
+        if v_stock:
+            return Response(v_stock, status=status.HTTP_200_OK)
+        else:
+            return Response("Products are not available", status=status.HTTP_400_BAD_REQUEST)
+
+
+

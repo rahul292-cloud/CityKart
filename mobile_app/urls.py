@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from .storeViews import *
 
 urlpatterns = [
     path('AdminLogin/', AdminLogin.as_view()),
@@ -10,4 +11,20 @@ urlpatterns = [
     path('UpdateVendorStoreDetails/', UpdateVendorStoreDetails.as_view()),
     path('AllVendorStoreDetails/', AllVendorStoreDetails.as_view()),
     path('getStoreDetailsById/', getStoreDetailsById.as_view()),
+
+    path('productDetailsView/', productDetailsView.as_view()),
+    path('productDetailsView/<str:pk>/', productDetailsView.as_view()),
+
+    path('ProductCategoryDetails/', ProductCategoryDetails.as_view()),
+    path('ProductCategoryDetails/<str:pk>/', ProductCategoryDetails.as_view()),
+
+    path('AddProductsToVendor/', AddProductsToVendor.as_view()),
+    path('AddProductsToVendor/<str:pk>/', AddProductsToVendor.as_view()),
+
+    path('GetAllProductsForStoreById/', GetAllProductsForStoreById.as_view()),
+
+    # store details
+    path('CreateVendorManagementAndStoreDetails/', CreateVendorManagementAndStoreDetails.as_view()),
+    path('VendorStoreLogin/', VendorStoreLogin.as_view()),
+    path('GetVendorsRegDetails/', GetVendorsRegDetails.as_view()),
 ]
