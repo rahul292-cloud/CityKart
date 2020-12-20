@@ -48,18 +48,18 @@ class AdminLogin(ObtainAuthToken):
 
 
 # sign up vender register   --- used by admin site
-class CreateVendorManagement(CreateAPIView):
-    model = Vendor_management
-    permission_classes = (AllowAny,)
-    serializer_class = VendorManagementSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = VendorManagementSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"data":serializer.data}, status=status.HTTP_200_OK)
-
-        return Response({"msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+# class CreateVendorManagement(CreateAPIView):
+#     model = Vendor_management
+#     permission_classes = (AllowAny,)
+#     serializer_class = VendorManagementSerializer
+#
+#     def post(self, request, *args, **kwargs):
+#         serializer = VendorManagementSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response({"data":serializer.data}, status=status.HTTP_200_OK)
+#
+#         return Response({"msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 # get all vendors details  ... admin site
 class GetAllvendorsDetails(APIView):
@@ -88,106 +88,106 @@ class GetAllvendorsDetails(APIView):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
-# add vendor store details by vendor id .... only for admin
-class AddVendorStoreDetails(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request, *args, **kwargs):
-        vendor_id = request.data.get('vendor_id', False)
-        store_name = request.data.get('store_name', False)
-        popular_name = request.data.get('popular_name', False)
-        address = request.data.get('address', False)
-        city = request.data.get('city', False)
-        post_code = request.data.get('post_code', False)
-        contact_person = request.data.get('contact_person', False)
-        contact_no1 = request.data.get('contact_no1', False)
-        contact_no2 = request.data.get('contact_no2', False)
-
-        V_store = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id)
-        if V_store.exists():
-            return Response({"msg":"Already Added this details , You Can Update!"}, status=status.HTTP_400_BAD_REQUEST)
-
-        v_store = VendorStore.objects.create(vendor_id=Vendor_management.objects.get(vendor_id=vendor_id),
-                                            store_name=store_name,
-                                            popular_name=popular_name,
-                                            address=address, city=city,
-                                            post_code=post_code,
-                                            contact_person=contact_person,
-                                            contact_no1=contact_no1,
-                                            contact_no2=contact_no2)
-        if v_store:
-            return Response({"data":"Details Added Successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"msg":"Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
+# # add vendor store details by vendor id .... only for admin
+# class AddVendorStoreDetails(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def post(self, request, *args, **kwargs):
+#         vendor_id = request.data.get('vendor_id', False)
+#         store_name = request.data.get('store_name', False)
+#         popular_name = request.data.get('popular_name', False)
+#         address = request.data.get('address', False)
+#         city = request.data.get('city', False)
+#         post_code = request.data.get('post_code', False)
+#         contact_person = request.data.get('contact_person', False)
+#         contact_no1 = request.data.get('contact_no1', False)
+#         contact_no2 = request.data.get('contact_no2', False)
+#
+#         V_store = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id)
+#         if V_store.exists():
+#             return Response({"msg":"Already Added this details , You Can Update!"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         v_store = VendorStore.objects.create(vendor_id=Vendor_management.objects.get(vendor_id=vendor_id),
+#                                             store_name=store_name,
+#                                             popular_name=popular_name,
+#                                             address=address, city=city,
+#                                             post_code=post_code,
+#                                             contact_person=contact_person,
+#                                             contact_no1=contact_no1,
+#                                             contact_no2=contact_no2)
+#         if v_store:
+#             return Response({"data":"Details Added Successfully"}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"msg":"Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
 
 # update vendor store details by vendor id .... only for admin
-class UpdateVendorStoreDetails(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request, *args, **kwargs):
-        vendor_id = request.data.get('vendor_id', False)
-        store_name = request.data.get('store_name', False)
-        popular_name = request.data.get('popular_name', False)
-        address = request.data.get('address', False)
-        city = request.data.get('city', False)
-        post_code = request.data.get('post_code', False)
-        contact_person = request.data.get('contact_person', False)
-        contact_no1 = request.data.get('contact_no1', False)
-        contact_no2 = request.data.get('contact_no2', False)
-
-        v_store = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id).update(store_name=store_name, popular_name=popular_name,
-                                                                                    address=address, city=city, post_code=post_code,
-                                                                                    contact_person=contact_person, contact_no1=contact_no1,
-                                                                                    contact_no2=contact_no2)
-        if v_store:
-            return Response({"data":"Details Updated Successfully"}, status=status.HTTP_200_OK)
-        else:
-            return Response({"msg":"Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
+# class UpdateVendorStoreDetails(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def post(self, request, *args, **kwargs):
+#         vendor_id = request.data.get('vendor_id', False)
+#         store_name = request.data.get('store_name', False)
+#         popular_name = request.data.get('popular_name', False)
+#         address = request.data.get('address', False)
+#         city = request.data.get('city', False)
+#         post_code = request.data.get('post_code', False)
+#         contact_person = request.data.get('contact_person', False)
+#         contact_no1 = request.data.get('contact_no1', False)
+#         contact_no2 = request.data.get('contact_no2', False)
+#
+#         v_store = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id).update(store_name=store_name, popular_name=popular_name,
+#                                                                                     address=address, city=city, post_code=post_code,
+#                                                                                     contact_person=contact_person, contact_no1=contact_no1,
+#                                                                                     contact_no2=contact_no2)
+#         if v_store:
+#             return Response({"data":"Details Updated Successfully"}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"msg":"Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Store Details:  -- admin panel
-class AllVendorStoreDetails(APIView):
-    permission_classes = (AllowAny,)
+# class AllVendorStoreDetails(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def get(self, request, *args, **kwargs):
+#         allVendorStore = VendorStore.objects.all().values('id', 'vendorStore_id', 'store_name',
+#                                                           'popular_name', 'address', 'city', 'post_code',
+#                                                           'contact_person', 'contact_no1', 'contact_no2',
+#                                                           'loc_latitude', 'loc_lonitude', 'created_at',
+#                                                           'updated_at').annotate(
+#             vendor_Id=F('vendor_id__vendor_id'),
+#             vendor_userName=F('vendor_id__userName'),
+#             # vendor_password=F('vendor_id__password'),
+#             vendor_first_name=F('vendor_id__first_name'),
+#             vendor_last_name=F('vendor_id__last_name'),
+#             vendor_table_id=F('vendor_id__id'),
+#         ).order_by('-pk')
+#
+#         if allVendorStore:
+#             return Response({"data":allVendorStore}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"msg":"Something went wrong!"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, *args, **kwargs):
-        allVendorStore = VendorStore.objects.all().values('id', 'vendorStore_id', 'store_name',
-                                                          'popular_name', 'address', 'city', 'post_code',
-                                                          'contact_person', 'contact_no1', 'contact_no2',
-                                                          'loc_latitude', 'loc_lonitude', 'created_at',
-                                                          'updated_at').annotate(
-            vendor_Id=F('vendor_id__vendor_id'),
-            vendor_userName=F('vendor_id__userName'),
-            # vendor_password=F('vendor_id__password'),
-            vendor_first_name=F('vendor_id__first_name'),
-            vendor_last_name=F('vendor_id__last_name'),
-            vendor_table_id=F('vendor_id__id'),
-        ).order_by('-pk')
 
-        if allVendorStore:
-            return Response({"data":allVendorStore}, status=status.HTTP_200_OK)
-        else:
-            return Response({"msg":"Something went wrong!"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-# get store details by Id   .... for admin site  .. delivery made cancel
-class getStoreDetailsById(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request, pk=None):
-        vendor_id = request.data.get('vendor_id', False)
-
-        vendor_store_details = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id).values('id', 'vendorStore_id',
-                                                                                                 'store_name', 'popular_name',
-                                                                                                 'address', 'city', 'post_code',
-                                                                                                 'contact_person', 'contact_no1',
-                                                                                                 'contact_no2', 'created_at').annotate(
-            vendor_userName = F('vendor_id__userName'),
-            vendor_password = F('vendor_id__password'),
-        )
-        if vendor_store_details.exists():
-            return Response({"data":vendor_store_details[0]}, status=status.HTTP_200_OK)
-        else:
-            return Response({"msg":"Store Details Is not Available , Add Store !"}, status=status.HTTP_400_BAD_REQUEST)
+# # get store details by Id   .... for admin site  .. delivery made cancel
+# class getStoreDetailsById(APIView):
+#     permission_classes = (AllowAny,)
+#
+#     def post(self, request, pk=None):
+#         vendor_id = request.data.get('vendor_id', False)
+#
+#         vendor_store_details = VendorStore.objects.filter(vendor_id__vendor_id=vendor_id).values('id', 'vendorStore_id',
+#                                                                                                  'store_name', 'popular_name',
+#                                                                                                  'address', 'city', 'post_code',
+#                                                                                                  'contact_person', 'contact_no1',
+#                                                                                                  'contact_no2', 'created_at').annotate(
+#             vendor_userName = F('vendor_id__userName'),
+#             vendor_password = F('vendor_id__password'),
+#         )
+#         if vendor_store_details.exists():
+#             return Response({"data":vendor_store_details[0]}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"msg":"Store Details Is not Available , Add Store !"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # get or create product category
@@ -332,7 +332,7 @@ class AddProductsToVendor(APIView):
     def post(self, request, *args, **kwargs):
         vendor_id = request.data.get('vendor_id', False)
         product_id = request.data.get('product_id', False)
-        vendor_Stock = Vendor_Stock.objects.filter(id=vendor_id, product_id=product_id)
+        vendor_Stock = Vendor_Stock.objects.filter(vendor_id__id=vendor_id, product_id=product_id)
         if vendor_Stock.exists():
             return Response('This Product Is Already Exists !', status=status.HTTP_400_BAD_REQUEST)
 
