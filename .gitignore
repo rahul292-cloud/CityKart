@@ -38,5 +38,11 @@ mobile_app/__pycache__/serializers.cpython-38.pyc
 mobile_app/__pycache__/urls.cpython-38.pyc
 mobile_app/__pycache__/*
 views.cpython-38.pyc
+CityKart/__pycache__/urls.cpython-38.pyc
+urls.cpython-38.pyc
+CityKart/__pycache__/
+CityKart/__pycache__/*
+CityKart/__pycache
+CityKart/migrations
 
 
