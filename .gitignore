@@ -1,7 +1,5 @@
 app.yaml.bakj
 *.pyc
-*.__pycache__
-*__pycache__
 Dockerfile
 start.sh
 main.py
@@ -9,40 +7,11 @@ settings.py
 /static
 /.idea
 /.vscode
-/.__pycache__
-/__pycache__
-/pycache__
 1NPDPRO5.DOC
 ~$PDPRO5.DOC
 
-*/*/*/__pycache__/
-*/*/__pycache__/
-*/__pycache__/
-
-*.log
-
-*.pot
-
+**/__pycache__
 
 dashboard/migrations
 mobile_app/migrations
-mobile_app/__pycache__/views.cpython-38.pyc
-pycache__/views.cpython-38.pyc
-
-
-dashboard/__pycache__/admin.cpython-38.pyc
-dashboard/__pycache__/vendorModel.cpython-38.pyc
-dashboard/__pycache__/vendorStockModel.cpython-38.pyc
-
-mobile_app/__pycache__/serializers.cpython-38.pyc
-mobile_app/__pycache__/urls.cpython-38.pyc
-mobile_app/__pycache__/*
-views.cpython-38.pyc
-CityKart/__pycache__/urls.cpython-38.pyc
-urls.cpython-38.pyc
-CityKart/__pycache__/
-CityKart/__pycache__/*
-CityKart/__pycache
-CityKart/migrations
-
 

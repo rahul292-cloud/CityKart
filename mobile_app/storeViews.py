@@ -26,7 +26,7 @@ from .serializers import *
 
 # sign up vender register and store  --- used by store site
 class CreateVendorManagementAndStoreDetails(CreateAPIView):
-    model = Vendor_management
+    # model = Vendor_management
     permission_classes = (AllowAny,)
     serializer_class = VendorManagementSerializer
 

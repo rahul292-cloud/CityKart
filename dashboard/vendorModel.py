@@ -21,21 +21,55 @@ class Vendor_management(models.Model):
     vendor_id = models.IntegerField(null=True, blank=True)
     vendor_register_no = models.IntegerField(default=randomNo)
     fullName = models.CharField(max_length=500, null=True, blank=False)
+    homeAddress = models.CharField(max_length=1000, null=True, blank=True)
+    phone_self = models.CharField(validators=[phone_regex], max_length=15, null=True, blank=False)
     shopName = models.CharField(max_length=500, null=True, blank=False)
-    phone1 = models.CharField(max_length=500, null=True, blank=False)
-    phone2 = models.CharField(max_length=500, null=True, blank=True)
-    shopAddress = models.CharField(max_length=100, null=True, blank=False)
+
+    shop_type_choices = (
+        ('General Store', 'General Store'),
+        ('Footwear', 'Footwear'),
+        ('Electronics', 'Electronics'),
+        ('Others', 'Others'),
+    )
+
+    shop_type = models.CharField(null=True, blank=True, max_length=200, choices=shop_type_choices)
+    phone_shop = models.CharField(validators=[phone_regex], max_length=15, null=True, blank=True)
+
+
+    # phone1 = models.CharField(max_length=500, null=True, blank=False)
+    # phone2 = models.CharField(max_length=500, null=True, blank=True)
+    shopAddress = models.CharField(max_length=1000, null=True, blank=False)
     city = models.CharField(max_length=500, null=True, blank=False)
     state = models.CharField(max_length=500, null=True, blank=False)
+
     pinCode = models.CharField(max_length=500, null=True, blank=False, unique=True)
     email = models.CharField(validators=[email_regex], max_length=500, null=True, blank=True)
+
     adhar_no  = models.CharField(max_length=500, null=True, blank=False)
     adhar_Img = models.FileField(blank=True, null=True, upload_to='adharImages/')
+
+    pAN_no = models.CharField(max_length=500, null=True, blank=True)
+    pAN_Img = models.FileField(blank=True, null=True, upload_to='PAN_Images/')
+
+    business_adhar_no = models.CharField(max_length=500, null=True, blank=True)
+    business_adhar_Img = models.FileField(blank=True, null=True, upload_to='BusinessAdharImages/')
+
+    business_pAN_no = models.CharField(max_length=500, null=True, blank=True)
+    business_pAN_Img = models.FileField(blank=True, null=True, upload_to='BusinessPAN_Images/')
+
+    gSTIN_no = models.CharField(max_length=500, null=True, blank=True)
+
     bank_name = models.CharField(max_length=500, null=True, blank=True)
     bank_branch = models.CharField(max_length=500, null=True, blank=True)
     bank_address = models.CharField(max_length=1000, null=True, blank=True)
     ifsc_code = models.CharField(max_length=500, null=True, blank=True)
     account_name = models.CharField(max_length=500, null=True, blank=True)
+    account_no = models.CharField(max_length=500, null=True, blank=True)
+
+    subscription_from = models.DateField(null=True, blank=True)
+    subscription_to = models.DateField(null=True, blank=True)
+
+    vendor_status = models.BooleanField(default=True)
 
     userName = models.CharField(max_length=500, null=True, blank=False)
     login_type = models.CharField(max_length=500, null=True, blank=True, default='Vendor')
@@ -57,6 +91,8 @@ class Vendor_management(models.Model):
         if self.pk is None:
             self.vendor_register_no = randomNo()
             self.created_at = datetime.datetime.now()
+            self.subscription_from = datetime.datetime.now()
+            self.subscription_to = datetime.datetime.now() + datetime.timedelta(days=365)
             usr_name = self.userName
             print(usr_name)
             user_obj = User.objects.create_user(
