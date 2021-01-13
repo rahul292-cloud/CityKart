@@ -25,6 +25,10 @@ urlpatterns = [
 
     # store details
     path('CreateVendorManagementAndStoreDetails/', CreateVendorManagementAndStoreDetails.as_view()),
+    path('RegisterVendorDetailsView/', RegisterVendorDetailsView.as_view()),
+
     path('VendorStoreLogin/', VendorStoreLogin.as_view()),
+
     path('GetVendorsRegDetails/', GetVendorsRegDetails.as_view()),
+    path('GetVendorsRegDetails/<str:pk>/', GetVendorsRegDetails.as_view()),
 ]

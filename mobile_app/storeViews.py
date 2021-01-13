@@ -38,6 +38,20 @@ class CreateVendorManagementAndStoreDetails(CreateAPIView):
 
         return Response({"msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+# sign up vender register and store  --- used by store site --- second method
+class RegisterVendorDetailsView(CreateAPIView):
+    # model = Vendor_management
+    permission_classes = (AllowAny,)
+    serializer_class = VendorRegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = VendorRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data":serializer.data}, status=status.HTTP_200_OK)
+
+        return Response({"msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Store Login ............ store site only
 class VendorStoreLogin(ObtainAuthToken):
@@ -64,6 +78,14 @@ class VendorStoreLogin(ObtainAuthToken):
 class GetVendorsRegDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
+    def get_object(self, pk):
+        try:
+            pk = pk
+            return Vendor_management.objects.get(pk=pk)
+        except Vendor_management.DoesNotExist:
+            raise Http404
+
+
     def get(self, request, pk=None):
         response = []
         data = Vendor_management.objects.filter(vendor_id=request.user.id)
@@ -74,3 +96,24 @@ class GetVendorsRegDetails(APIView):
             # return Response(response, status=status.HTTP_200_OK)
         # return Response(response, status=status.HTTP_400_BAD_REQUEST)
         return Response(response, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        print(request.data)
+        id = pk
+        instance = self.get_object(id)
+        # print(instance)
+        serializer = GetVendorManagementSerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            # print(serializer.data)
+            return Response({"data":serializer.data})
+        return Response({"msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        usr = self.get_object(pk)
+        print(usr.userName)
+        u_sr = User.objects.get(username=str(usr.userName))
+        u_sr.delete()
+
+        usr.delete()
+        return Response({"msg":"User Deleted"})

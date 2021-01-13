@@ -154,6 +154,93 @@ class VendorManagementSerializer(serializers.ModelSerializer):  # serializers.Mo
                   'bank_name', 'bank_branch', 'bank_address',
                   'ifsc_code', 'account_name', 'account_no', 'password', 'password2')  # 'userName',
 
+class VendorRegisterSerializer(serializers.ModelSerializer):
+    userName = serializers.CharField(label='Username', required=True)
+    fullName = serializers.CharField(label='fullName', required=True)
+    email = serializers.CharField(label='email')
+    # mob_no = serializers.CharField(label='Mobile_No')
+
+    password = serializers.CharField(label='Password')
+    password2 = serializers.CharField(label='Confirm Password')
+
+    def validate_password2(self, value):
+        data = self.get_initial()
+        password1 = data.get("password")
+        password2 = value
+        if password1 != password2:
+            raise serializers.ValidationError("Password Must Match")
+
+        """Validates that a password is as least 8 characters long and has at least
+            2 digits and 1 Upper case letter.
+            """
+        msg = 'Note: password is as least 8 characters long and has at least 2 digits and 1 Upper case letter'
+        min_length = 8
+
+        if len(value) < min_length:
+            raise serializers.ValidationError('Password must be at least {0} characters '
+                                              'long.'.format(min_length) + msg)
+
+        # check for 2 digits
+        if sum(c.isdigit() for c in value) < 2:
+            raise serializers.ValidationError('Password must container at least 2 digits.' + msg)
+
+        # check for uppercase letter
+        if not any(c.isupper() for c in value):
+            raise serializers.ValidationError('Password must container at least 1 uppercase letter.' + msg)
+
+        return value
+
+    def validate_userName(self, value):
+        data = self.get_initial()
+        userName = data.get("userName")
+        username_qs = User.objects.filter(username=userName)
+        if username_qs.exists():
+            raise serializers.ValidationError("username already exists!")
+        return value
+
+    def validate_email(self, value):
+        data = self.get_initial()
+        email = data.get("email")
+        regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        if (re.search(regex, email)):
+
+            # username_qs = User.objects.filter(username=email)  # userName
+            # if username_qs.exists():
+            #     raise serializers.ValidationError("username already exists!")
+            return value
+        raise serializers.ValidationError("invalid Email id")
+
+
+    # def validate_mob_no(self, value):
+    #     data = self.get_initial()
+    #     mob_no = data.get("mob_no")
+    #     regex = '^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$'
+    #
+    #     if (re.search(regex, mob_no)):
+    #         # username_qs = User.objects.filter(username=mob_no)
+    #         # if username_qs.exists():
+    #         #     raise serializers.ValidationError("mob_no already exists")
+    #         # else:
+    #         #     pass
+    #         return value
+    #     raise serializers.ValidationError("Phone number must be entered in the format: '9999999999',9892799999 Up to 14 digits allowed.")
+
+    def create(self, validated_data):
+        user = Vendor_management.objects.create(
+            userName=validated_data['userName'],
+            fullName=validated_data['fullName'],
+            email=validated_data['email'],
+
+            password=validated_data['password']
+        )
+        return validated_data
+
+    class Meta:
+        model = Vendor_management
+        fields = ('email', 'fullName', 'userName', 'password', 'password2')
+
+
+
 
 class GetVendorManagementSerializer(serializers.ModelSerializer):
     # payment_mode = serializers.ChoiceField(choices=Vendor_management.payment_mode_choices, required=False)
@@ -162,11 +249,43 @@ class GetVendorManagementSerializer(serializers.ModelSerializer):
         model = Vendor_management
         fields = ['id', 'vendor_id', 'vendor_register_no', 'email', 'fullName', 'shopName', 'phone_self', 'phone_shop',
                   'homeAddress', 'shop_type', 'shopAddress',
-                  'city', 'state', 'pinCode', 'email', 'adhar_no', 'adhar_Img', 'pAN_no', 'pAN_Img', 'business_adhar_no',
+                  'city', 'state', 'pinCode', 'adhar_no', 'adhar_Img', 'pAN_no', 'pAN_Img', 'business_adhar_no',
                   'business_adhar_Img', 'business_pAN_no', 'business_pAN_Img', 'gSTIN_no',
                   'bank_name', 'bank_branch', 'bank_address',
                   'ifsc_code', 'account_name', 'account_no', 'userName', 'login_type', 'created_at',]
-        # depth = 1
+
+    def update(self, instance, validated_data):
+        instance.shopName = validated_data.get('shopName', instance.shopName)
+        instance.phone_self = validated_data.get('phone_self', instance.phone_self)
+        instance.phone_shop = validated_data.get('phone_shop', instance.phone_shop)
+        instance.homeAddress = validated_data.get('homeAddress', instance.homeAddress)
+        instance.shop_type = validated_data.get('shop_type', instance.shop_type)
+        instance.shopAddress = validated_data.get('shopAddress', instance.shopAddress)
+        instance.city = validated_data.get('city', instance.city)
+        instance.state = validated_data.get('state', instance.state)
+        instance.pinCode = validated_data.get('pinCode', instance.pinCode)
+        instance.adhar_no = validated_data.get('adhar_no', instance.adhar_no)
+        instance.adhar_Img = validated_data.get('adhar_Img', instance.adhar_Img)
+        instance.pAN_no = validated_data.get('pAN_no', instance.pAN_no)
+        instance.pAN_Img = validated_data.get('pAN_Img', instance.pAN_Img)
+        instance.business_adhar_no = validated_data.get('business_adhar_no', instance.business_adhar_no)
+        instance.business_adhar_Img = validated_data.get('business_adhar_Img', instance.business_adhar_Img)
+        instance.business_pAN_no = validated_data.get('business_pAN_no', instance.business_pAN_no)
+        instance.business_pAN_Img = validated_data.get('business_pAN_Img', instance.business_pAN_Img)
+        instance.gSTIN_no = validated_data.get('gSTIN_no', instance.gSTIN_no)
+        instance.bank_name = validated_data.get('bank_name', instance.bank_name)
+        instance.bank_branch = validated_data.get('bank_branch', instance.bank_branch)
+        instance.bank_address = validated_data.get('bank_address', instance.bank_address)
+        instance.ifsc_code = validated_data.get('ifsc_code', instance.ifsc_code)
+        instance.account_name = validated_data.get('account_name', instance.account_name)
+        instance.account_no = validated_data.get('account_no', instance.account_no)
+        instance.created_at = validated_data.get('created_at', instance.created_at)
+
+        instance.save()
+
+        return instance
+
+
 
 class Product_CategorySerializer(serializers.ModelSerializer):
 
