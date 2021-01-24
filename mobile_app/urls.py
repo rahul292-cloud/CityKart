@@ -18,6 +18,12 @@ urlpatterns = [
     path('ProductCategoryDetails/', ProductCategoryDetails.as_view()),
     path('ProductCategoryDetails/<str:pk>/', ProductCategoryDetails.as_view()),
 
+    path('SubCategoryDetails/', SubCategoryDetails.as_view()),
+    path('SubCategoryDetails/<str:pk>/', SubCategoryDetails.as_view()),
+
+    path('PinCodeDetails/', PinCodeDetails.as_view()),
+    path('PinCodeDetails/<str:pk>/', PinCodeDetails.as_view()),
+
     path('AddProductsToVendor/', AddProductsToVendor.as_view()),
     path('AddProductsToVendor/<str:pk>/', AddProductsToVendor.as_view()),
 

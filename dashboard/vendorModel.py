@@ -13,6 +13,8 @@ def randomNo():
     return random.randint(1000,9999)
 
 class Vendor_management(models.Model):
+    referal_code = models.IntegerField(default=randomNo)
+    referal_code_by_other = models.IntegerField(default=0, null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$',
                                  message="Phone number must be entered in the format: '999999999',0989279999 Up to 14 digits allowed.")
     email_regex = RegexValidator(regex=r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$',
@@ -90,6 +92,7 @@ class Vendor_management(models.Model):
 
         if self.pk is None:
             self.vendor_register_no = randomNo()
+            self.referal_code = randomNo()
             self.created_at = datetime.datetime.now()
             self.subscription_from = datetime.datetime.now()
             self.subscription_to = datetime.datetime.now() + datetime.timedelta(days=365)

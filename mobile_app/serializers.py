@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from dashboard.vendorModel import Vendor_management
-from dashboard.productModel import Product_category, Product
+from dashboard.productModel import Product_category, Product, Sub_category
 from dashboard.vendorStockModel import Vendor_Stock
+from dashboard.pinCodeList import PinCodeList
 import re
 
 class VendorManagementSerializer(serializers.ModelSerializer):  # serializers.ModelSerializer , serializers.Serializer
@@ -33,6 +34,7 @@ class VendorManagementSerializer(serializers.ModelSerializer):  # serializers.Mo
     ifsc_code = serializers.CharField(label='ifsc_code', required=False, default='NA')
     account_name = serializers.CharField(label='account_name', required=False, default='NA')
     account_no = serializers.CharField(label='account_no', required=False, default='NA')
+    referal_code_by_other = serializers.IntegerField(label='referal_code_by_other', required=False, default=0)
 
     # email = serializers.EmailField(label='Email Address')
     # mob_no = serializers.CharField(label='Mobile_No')
@@ -107,6 +109,16 @@ class VendorManagementSerializer(serializers.ModelSerializer):  # serializers.Mo
             raise serializers.ValidationError("pin code already exists!")
         return value
 
+    def validate_referal_code_by_other(self, value):
+        data = self.get_initial()
+        referal_code_by_other = data.get("referal_code_by_other")
+
+        referal_qs = Vendor_management.objects.filter(referal_code=referal_code_by_other)
+        if referal_qs.exists():
+            return value
+        else:
+            raise serializers.ValidationError("pin code already exists!")
+
     def create(self, validated_data):
 
         # username_qs = User.objects.filter(username=validated_data['email'])  # userName
@@ -141,7 +153,8 @@ class VendorManagementSerializer(serializers.ModelSerializer):  # serializers.Mo
             ifsc_code=validated_data['ifsc_code'],
             account_name=validated_data['account_name'],
             account_no=validated_data['account_no'],
-            password=validated_data['password']
+            password=validated_data['password'],
+            referal_code_by_other=validated_data['referal_code_by_other']
         )
 
         return validated_data
@@ -151,7 +164,7 @@ class VendorManagementSerializer(serializers.ModelSerializer):  # serializers.Mo
         fields = ('email', 'fullName', 'shopName', 'phone_self', 'phone_shop', 'homeAddress', 'shop_type', 'shopAddress',
                   'city', 'state', 'pinCode', 'email', 'adhar_no', 'adhar_Img', 'pAN_no', 'pAN_Img', 'business_adhar_no',
                   'business_adhar_Img', 'business_pAN_no', 'business_pAN_Img', 'gSTIN_no',
-                  'bank_name', 'bank_branch', 'bank_address',
+                  'bank_name', 'bank_branch', 'bank_address','referal_code_by_other',
                   'ifsc_code', 'account_name', 'account_no', 'password', 'password2')  # 'userName',
 
 class VendorRegisterSerializer(serializers.ModelSerializer):
@@ -162,6 +175,7 @@ class VendorRegisterSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(label='Password')
     password2 = serializers.CharField(label='Confirm Password')
+    referal_code_by_other = serializers.IntegerField(label='referal_code_by_other', required=False, default=0)
 
     def validate_password2(self, value):
         data = self.get_initial()
@@ -210,26 +224,22 @@ class VendorRegisterSerializer(serializers.ModelSerializer):
             return value
         raise serializers.ValidationError("invalid Email id")
 
+    def validate_referal_code_by_other(self, value):
+        data = self.get_initial()
+        referal_code_by_other = data.get("referal_code_by_other")
 
-    # def validate_mob_no(self, value):
-    #     data = self.get_initial()
-    #     mob_no = data.get("mob_no")
-    #     regex = '^(\+91[\-\s]?)?[0]?(91)?[789]\d{9}$'
-    #
-    #     if (re.search(regex, mob_no)):
-    #         # username_qs = User.objects.filter(username=mob_no)
-    #         # if username_qs.exists():
-    #         #     raise serializers.ValidationError("mob_no already exists")
-    #         # else:
-    #         #     pass
-    #         return value
-    #     raise serializers.ValidationError("Phone number must be entered in the format: '9999999999',9892799999 Up to 14 digits allowed.")
+        referal_qs = Vendor_management.objects.filter(referal_code=referal_code_by_other)
+        if referal_qs.exists():
+            return value
+        else:
+            raise serializers.ValidationError("pin code already exists!")
 
     def create(self, validated_data):
         user = Vendor_management.objects.create(
             userName=validated_data['userName'],
             fullName=validated_data['fullName'],
             email=validated_data['email'],
+            referal_code_by_other=validated_data['referal_code_by_other'],
 
             password=validated_data['password']
         )
@@ -237,7 +247,7 @@ class VendorRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vendor_management
-        fields = ('email', 'fullName', 'userName', 'password', 'password2')
+        fields = ('email', 'fullName', 'userName', 'password', 'password2', 'referal_code_by_other')
 
 
 
@@ -251,7 +261,7 @@ class GetVendorManagementSerializer(serializers.ModelSerializer):
                   'homeAddress', 'shop_type', 'shopAddress',
                   'city', 'state', 'pinCode', 'adhar_no', 'adhar_Img', 'pAN_no', 'pAN_Img', 'business_adhar_no',
                   'business_adhar_Img', 'business_pAN_no', 'business_pAN_Img', 'gSTIN_no',
-                  'bank_name', 'bank_branch', 'bank_address',
+                  'bank_name', 'bank_branch', 'bank_address', 'referal_code_by_other','referal_code',
                   'ifsc_code', 'account_name', 'account_no', 'userName', 'login_type', 'created_at',]
 
     def update(self, instance, validated_data):
@@ -304,6 +314,47 @@ class Product_CategorySerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class Sub_CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sub_category
+        fields = ['id', 'product_category_id', 'category_id', 'category_name', 'category_description', 'product_thumbnail', 'status'
+                  ]
+
+    def update(self, instance, validated_data):
+        instance.product_category_id = validated_data.get('product_category_id', instance.product_category_id)
+        instance.category_id = validated_data.get('category_id', instance.category_id)
+        instance.category_name = validated_data.get('category_name', instance.category_name)
+        instance.category_description = validated_data.get('category_description', instance.category_description)
+        instance.product_thumbnail = validated_data.get('product_thumbnail', instance.product_thumbnail)
+        instance.status = validated_data.get('status', instance.status)
+
+        instance.save()
+
+        return instance
+
+
+class PinCodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PinCodeList
+        fields = ['id', 'pin_code', 'area', 'region', 'city_name', 'state', 'status'
+                  ]
+
+    def update(self, instance, validated_data):
+        instance.pin_code = validated_data.get('pin_code', instance.pin_code)
+        instance.area = validated_data.get('area', instance.area)
+        instance.region = validated_data.get('region', instance.region)
+        instance.city_name = validated_data.get('city_name', instance.city_name)
+        instance.state = validated_data.get('state', instance.state)
+        instance.status = validated_data.get('status', instance.status)
+
+        instance.save()
+
+        return instance
+
+
 
 class Product_viewSerializer(serializers.ModelSerializer):
     class Meta:

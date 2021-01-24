@@ -19,8 +19,9 @@ import random
 import re
 from dashboard.vendorModel import Vendor_management
 from dashboard.vendorStoreModel import VendorStore
-from dashboard.productModel import Product, Product_category
+from dashboard.productModel import Product, Product_category, Sub_category
 from dashboard.vendorStockModel import Vendor_Stock
+from dashboard.pinCodeList import PinCodeList
 
 from .serializers import *
 
@@ -248,6 +249,125 @@ class ProductCategoryDetails(APIView):
         productCategory = self.get_object(pk)
         productCategory.delete()
         return Response("productCategory Deleted")
+
+# create sub category details
+class SubCategoryDetails(APIView):
+    permission_classes = (AllowAny,)
+
+    def get_object(self, pk):
+        try:
+            pk = pk
+            return Sub_category.objects.get(pk=pk)
+        except Sub_category.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk=None):
+        if pk:
+            response = []
+            pk = pk
+
+            data = Sub_category.objects.filter(id=pk)
+            serializer = Sub_CategorySerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+        else:
+            response = []
+            pk = None
+            data = Sub_category.objects.all().order_by('-pk')
+            serializer = Sub_CategorySerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+    def post(self, request, pk=None):
+        print(request.data)
+
+        serializer = Sub_CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        print(request.data)
+        id = pk
+        instance = self.get_object(id)
+        print(instance)
+        serializer = Sub_CategorySerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        # pk = ObjectId(pk)
+        pk = pk
+        productCategory = self.get_object(pk)
+        productCategory.delete()
+        return Response("productCategory Deleted")
+
+
+# create pincode details
+class PinCodeDetails(APIView):
+    permission_classes = (AllowAny,)
+
+    def get_object(self, pk):
+        try:
+            pk = pk
+            return PinCodeList.objects.get(pk=pk)
+        except PinCodeList.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk=None):
+        if pk:
+            response = []
+            pk = pk
+
+            data = PinCodeList.objects.filter(id=pk)
+            serializer = PinCodeSerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+        else:
+            response = []
+            pk = None
+            data = PinCodeList.objects.all().order_by('-pk')
+            serializer = PinCodeSerializer(data, many=True)
+            if data:
+                response = serializer.data
+            return Response(response)
+
+    def post(self, request, pk=None):
+        print(request.data)
+
+        serializer = PinCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        print(request.data)
+        id = pk
+        instance = self.get_object(id)
+        print(instance)
+        serializer = PinCodeSerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        # pk = ObjectId(pk)
+        pk = pk
+        productCategory = self.get_object(pk)
+        productCategory.delete()
+        return Response("Deleted")
 
 
 # get or create the product

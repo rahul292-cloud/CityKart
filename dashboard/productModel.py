@@ -15,7 +15,7 @@ class Product_category(models.Model):
     category_name = models.CharField(null=False, blank=True, max_length=200)
     category_description = models.CharField(null=True, blank=True, max_length=200)
     product_thumbnail = models.FileField(blank=True, null=True, upload_to='productCategoryImages/')
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     created_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
@@ -35,6 +35,34 @@ class Product_category(models.Model):
                                                                        using=None,
                                                                        update_fields=None)
         return product_category_save
+
+class Sub_category(models.Model):
+    product_category_id = models.ForeignKey(Product_category, on_delete=models.SET_NULL, null=True, blank=True)
+    category_id = models.IntegerField(null=False, blank=True, default=randomNo)
+    category_name = models.CharField(null=False, blank=True, max_length=200)
+    category_description = models.CharField(null=True, blank=True, max_length=200)
+    product_thumbnail = models.FileField(blank=True, null=True, upload_to='subCategoryImages/')
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.category_name
+
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.pk is None:
+            self.created_at = datetime.datetime.now()
+            sub_category_save = super(Sub_category, self).save(force_insert=False, force_update=False,
+                                                                       using=None,
+                                                                       update_fields=None)
+        else:
+            self.updated_at = datetime.datetime.now()
+            sub_category_save = super(Sub_category, self).save(force_insert=False, force_update=False,
+                                                                       using=None,
+                                                                       update_fields=None)
+        return sub_category_save
+
 
 
 class Product(models.Model):
