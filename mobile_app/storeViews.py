@@ -74,7 +74,7 @@ class VendorStoreLogin(ObtainAuthToken):
         else:
             return Response({"msg": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-# get vendor register and store details ..... store site
+# get vendor register and store details .... store site
 class GetVendorsRegDetails(APIView):
     permission_classes = (IsAuthenticated,)
 
